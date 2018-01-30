@@ -7,7 +7,7 @@ public class Main {
 
     public static void main (String[] args){
 
-        //Creación de los objetos de la clase Empleado mediante un arreglo de tipo clase 'Empleado':
+        //Creación de los objetos de la clase Empleado mediante vector de objetos de tipo 'Empleado':
 
         Empleado[] misEmpleados = new Empleado[6]; //Tener en cuenta el tipo del arreglo. Este es de tipo 'Empleado' y guarda objetos de esta clase.
 
@@ -20,10 +20,10 @@ public class Main {
         /*Polimorfismo en acción. Principio de sustitución: Se puede utilizar un objeto de la subclase siempre que el programa espere
         un objeto de la superclase. Esto es posible por la regla "es un" de la herencia: Un jefe es un empleado. En el vector misEmpleados
         de tipo 'Empleado' se guardan objetos de la superclase 'Empleado' y objetos de la subclase 'Jefatura'. */
-        Jefatura jefeRecursosHumanos = new Jefatura("Alejandro", 55000, 2018, 01, 1);
+        Jefatura jefeRecursosHumanos = new Jefatura("Alejandro", 55000, 2018, 1, 1);
         jefeRecursosHumanos.setIncentivo(2570);
         misEmpleados[4] = jefeRecursosHumanos;
-        misEmpleados[5] = new Jefatura("Mario", 32000, 2018, 01, 28);
+        misEmpleados[5] = new Jefatura("Mario", 32000, 2018, 1, 28);
 
         /*Vídeo 44: Casting o refundición de objetos: En el vector de tipo empleado se guardan objetos de la superclase y de la subclase,
         posible por el principio de sustitución; pero el vector sólo hace uso de los métodos definidos en la  superclase 'Empleado', por
@@ -39,20 +39,23 @@ public class Main {
 
         //Método para aumentar en 5% el sueldo de cada empleado:
 
-        for (int i = 0; i < misEmpleados.length; i++) {
-            misEmpleados[i].setSubeSueldo(5); //Los objetos de la subclase pueden hacer uso de los métodos de la clase padre.
+        for (Empleado misEmpleado : misEmpleados) {
+            misEmpleado.setSubeSueldo(5); //Los objetos de la subclase pueden hacer uso de los métodos de la clase padre.
         }
 
         //Método para imprimir los datos
 
-        for (int i = 0; i < misEmpleados.length; i++) {
-            System.out.println(misEmpleados[i].getNombre() + " " +
-                    misEmpleados[i].getSueldo()
+        for (Empleado misEmpleado : misEmpleados) {
+            System.out.println(misEmpleado.getNombre() + " " + misEmpleado.getID() + " " +
+                    misEmpleado.getSueldo()
                     /*Polimorfismo en acción: Cuando se ha sobreescrito un método y, en este caso, los objetos de la superclase y de la
                     subclase están dentro de un vector, el método sobreescrito, getSueldo, se comporta diferente para los dos tipos de objetos:
                     Para los objetos de la superclase se le suma al sueldo un 5% y para los de la subclase, además del 5%, se le suma un incentivo
-                    establacido en el método setIncentivo.  */
-                    + " " + misEmpleados[i].getFechaIngreso()) ;
+                    establecido en el método setIncentivo.
+
+                    El compilador de java en tiempo de ejecución sabe a qué método (sobreescrito) llamar de forma automática dependiendo del
+                    objeto que lo invoque. A esto se le conoce como enlazado dinámico.  */
+                    + " " + misEmpleado.getFechaIngreso());
         }
     }
 }
@@ -62,9 +65,14 @@ class  Empleado {
     //Variables de la clase o atributos del objeto. Variables globales:
 
     //'private' para que se cumpla el concepto de encapsulación.
-    private String nombre;
+    private final String nombre;
     private double sueldo;
     private Date fechaIngreso; //Importar paquete java.util
+    private int ID;
+    /*Variable estática: Variable que no pertenece a los objetos sino que pertenece a la clase. Además no tiene copias, es única (No confundir con una constante).
+    Todos los objetos de la clase comparten el valor de esta variable. Para manipular una variable estática se necesita de un método estático. La sintaxis para el
+    llamado de un miembro estático es: nombre_clase.nombre_metodo.  */
+    private static int idSiguiente = 1;
 
     //Constructor con parámetros de la clase: Permite dar un estado inicial a un objeto. Inicializa las variables declaradas.
 
@@ -73,6 +81,10 @@ class  Empleado {
         //Instrucción 'this.' para hacer referencia a una variable de clase.
         this.nombre = nombre;
         this.sueldo = sueldo;
+        /*Cada vez que se crea un objeto automáticamente se le asigna un ID y este se incrementa para ser asignado a un próximo objeto cuando se cree.
+        En este caso, el hecho de la variable estática es para que el valor de idSiguiente no dependa de la creación de un objeto.    */
+        ID = idSiguiente;
+        idSiguiente++;
 
         //Uso de la clase GregorianCalendar
 
@@ -86,6 +98,10 @@ class  Empleado {
 
     public String getNombre (){
         return nombre;
+    }
+
+    public int getID (){
+        return ID;
     }
 
     public double getSueldo (){
@@ -119,7 +135,7 @@ class  Empleado {
         definirlos se hace uso de 'this', como se muestra debajo: Este udo de 'this' llama al constructor definido arriba. En caso de haber
         otros constructores, tal 'this' apuntaría al que tenga la misma cantidad de parámetros.*/
 
-        this (nombre, 30000, 2000, 01, 01);
+        this (nombre, 30000, 2000, 1, 1);
     }
 }
 
@@ -134,11 +150,11 @@ class Jefatura extends Empleado {
     //Constructor de la clase:
 
     public Jefatura (String nombre, double sueldo, int year, int mes, int dia){
+        /*Cuando el constructor de la superclase tiene parámetros y esta clase se hereda el constructor de la subclase debe tener estos
+        mismos parámetros, mas otros nuevos, y estos deben ser especificados en la instruccción 'super (parámetros superclase);'. Si tal
+        constructor no tiene parámetros, se deja solo 'super();' dentro del constructor de la subclase.*/
         super(nombre, sueldo, year, mes, dia);
     }
-
-    /*Método que obtiene el sueldo de un jefe: Este método aumenta un pago de incentivo al sueldo. Sobreescritura del método getSueldo
-    definido en la clase padre 'Empleado'.   */
 
     //Método para definir un incentivo que se le da a un jefe:
 
@@ -146,14 +162,17 @@ class Jefatura extends Empleado {
         this.incentivo = incentivo;
     }
 
+    /*Método que obtiene el sueldo de un jefe: Este método aumenta un pago de incentivo al sueldo. Sobreescritura del método getSueldo
+    definido en la clase padre 'Empleado'.   */
+
     public double getSueldo () {
 
             /*Variable local: Llamada al método getSueldo de la clase padre, el cual retorna el sueldo del empleado (objeto) y es
             almacenado en la variable sueldoJefe. Esta llamada es con el objetivo de acceder a la variable 'sueldo' definida en la clase
             padre.
 
-            Un llamado a un método de la clase padre desde una clase hija se aplica cuando una clase hija necesita acceder a
-            una variable definida en la clase padre y para esto tal método debe ser de tipo getter y que retorne tal variable.
+            Un llamado a un método de la superclase desde una subclase se aplica cuando una subclase necesita acceder a una variable
+            definida en la superclase y que sea privada; para esto tal método debe ser de tipo getter y que retorne tal variable.
 
             La sintaxis para llamar a un método de la clase padre desde la clase hija es: super.-nombre_metodo-
 
