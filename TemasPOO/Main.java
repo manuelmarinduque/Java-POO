@@ -43,6 +43,12 @@ public class Main {
             misEmpleado.setSubeSueldo(5); //Los objetos de la subclase pueden hacer uso de los métodos de la clase padre.
         }
 
+        /*Método para ordenar el vector misEmpleados por sueldo de menor a mayor. Tener en cuenta el método .sort de la clase Arrays, este debe ser
+        elegido de acuerdo al tipo de dato que se ingresa como parámetro,  y la implementación de la interface 'Comparable' en la clase Empleado ya que
+        esta clase es el tipo de dato del vector.   */
+
+        Arrays.sort(misEmpleados);
+
         //Método para imprimir los datos
 
         for (Empleado misEmpleado : misEmpleados) {
@@ -60,7 +66,10 @@ public class Main {
     }
 }
 
-class  Empleado {
+/*Para que se pueda hacer el uso adecuado del método sort la clase Empleado debe implementar la interface 'Comparable', así lo marca la API de java, y sobreescribir
+obligatoriamente su método: compareTo.*/
+
+class  Empleado implements Comparable {
 
     //Variables de la clase o atributos del objeto. Variables globales:
 
@@ -69,20 +78,23 @@ class  Empleado {
     private double sueldo;
     private Date fechaIngreso; //Importar paquete java.util
     private int ID;
-    /*Variable estática: Variable que no pertenece a los objetos sino que pertenece a la clase. Además no tiene copias, es única (No confundir con una constante).
-    Todos los objetos de la clase comparten el valor de esta variable. Para manipular una variable estática se necesita de un método estático. La sintaxis para el
-    llamado de un miembro estático es: nombre_clase.nombre_metodo.  */
+    /*Variable estática: Variable que no pertenece a los objetos sino que pertenece a la clase, por lo que tal variable no depende de la creación de un objeto.
+    Además no tiene copias, es única (No confundir con una constante). Todos los objetos de la clase comparten el valor de esta variable. Para manipular una
+    variable estática se necesita de un método estático. La sintaxis para el llamado de un miembro estático es: nombre_clase.nombre_metodo/variable. No es
+    necesario crear un objeto de la clase para hacer uso de una variable o método estático. Para convertir un miembro como estática se pone el modificador
+    de acceso 'static' delante de una variable o método. Una variable estática debe ser declarada en la cabecera de la clase, donde se declaran las variables
+    globales, esta no debe ser local si el método es no estático.   */
     private static int idSiguiente = 1;
 
     //Constructor con parámetros de la clase: Permite dar un estado inicial a un objeto. Inicializa las variables declaradas.
 
-    public Empleado(String nombre, double sueldo, int year, int mes, int dia) {
+    Empleado(String nombre, double sueldo, int year, int mes, int dia) {
 
         //Instrucción 'this.' para hacer referencia a una variable de clase.
         this.nombre = nombre;
         this.sueldo = sueldo;
-        /*Cada vez que se crea un objeto automáticamente se le asigna un ID y este se incrementa para ser asignado a un próximo objeto cuando se cree.
-        En este caso, el hecho de la variable estática es para que el valor de idSiguiente no dependa de la creación de un objeto.    */
+        /*Cada vez que se crea un objeto automáticamente se le asigna un ID y este luego se incrementa para ser asignado a un próximo objeto cuando se cree.
+        En este caso, el hecho de la variable estática es para que el valor de idSiguiente no dependa de la creación de un objeto y sea compartido por todos.    */
         ID = idSiguiente;
         idSiguiente++;
 
@@ -96,23 +108,23 @@ class  Empleado {
 
     //Métodos getters & setters: Para que se cumpla el concepto de encapsulación.
 
-    public String getNombre (){
+    String getNombre (){
         return nombre;
     }
 
-    public int getID (){
+    int getID (){
         return ID;
     }
 
-    public double getSueldo (){
+    double getSueldo (){
         return sueldo;
     }
 
-    public Date getFechaIngreso (){
+    Date getFechaIngreso (){
         return fechaIngreso;
     }
 
-    public void setSubeSueldo(double porcentaje) {
+    void setSubeSueldo(double porcentaje) {
 
         //Variable local:
         double aumento = sueldo*porcentaje/100;
@@ -127,7 +139,7 @@ class  Empleado {
      el nombre y se desconoce el sueldo y la fecha en que entra a trabajar un empleado. Para suplir este desconocimiento se crea un nuevo
      constructor que lo cubra. */
 
-    public Empleado (String nombre) {
+    Empleado (String nombre) {
 
         //this.nombre = nombre;
 
@@ -136,6 +148,25 @@ class  Empleado {
         otros constructores, tal 'this' apuntaría al que tenga la misma cantidad de parámetros.*/
 
         this (nombre, 30000, 2000, 1, 1);
+    }
+
+    @Override
+    public int compareTo(Object miObjeto) {
+        /*Se hace casting de objetos, cast a tipo Empleado ya que el parámetro de tal método es de tipo Object, y así comparar los sueldos
+        de los empleados. Luego debe darse sentido al método con la instrucción 'if', debido a la definición del método en la API. También
+        se puede ordenar por ID y otros tipos. En general, en el 'if' se declara por cuál dato ordenar. */
+
+        Empleado otroEmpleado = (Empleado) miObjeto;
+
+        if (this.sueldo<otroEmpleado.sueldo) {
+            return -1;
+        }
+
+        if (this.sueldo>otroEmpleado.sueldo){
+            return 1;
+        }
+
+        return 0;
     }
 }
 
@@ -149,7 +180,7 @@ class Jefatura extends Empleado {
 
     //Constructor de la clase:
 
-    public Jefatura (String nombre, double sueldo, int year, int mes, int dia){
+    Jefatura (String nombre, double sueldo, int year, int mes, int dia){
         /*Cuando el constructor de la superclase tiene parámetros y esta clase se hereda el constructor de la subclase debe tener estos
         mismos parámetros, mas otros nuevos, y estos deben ser especificados en la instruccción 'super (parámetros superclase);'. Si tal
         constructor no tiene parámetros, se deja solo 'super();' dentro del constructor de la subclase.*/
@@ -158,7 +189,7 @@ class Jefatura extends Empleado {
 
     //Método para definir un incentivo que se le da a un jefe:
 
-    public void setIncentivo (double incentivo) {
+    void setIncentivo (double incentivo) {
         this.incentivo = incentivo;
     }
 
